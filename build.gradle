@@ -29,7 +29,7 @@ subprojects {
     tasks.withType(Javadoc).all { enabled = false }
 }
 
-group = 'org.json'
+group = 'it.json'
 version = 'v20200429-SNAPSHOT'
 description = 'JSON in Java'
 sourceCompatibility = '1.7'

@@ -27,15 +27,15 @@ jobs:
       - name: Compile Java ${{ matrix.java }}
         run: |
           mkdir -p target/classes
-          javac -d target/classes/ src/main/java/org/json/*.java
+          javac -d target/classes/ src/main/java/it.json/*.java
       - name: Create java ${{ matrix.java }} JAR
         run: |
-          jar cvf target/org.json.jar -C target/classes .
+          jar cvf target/it.json.jar -C target/classes .
       - name: Upload Java ${{ matrix.java }} JAR
         uses: actions/upload-artifact@v1
         with:
           name: Java ${{ matrix.java }} JAR
-          path: target/org.json.jar
+          path: target/it.json.jar
       
   build:
     runs-on: ubuntu-16.04

@@ -1,9 +1,9 @@
-JSON in Java [package org.json]
+JSON in Java [package it.json]
 ===============================
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
+[![Maven Central](https://img.shields.io/maven-central/v/it.json/json.svg)](https://mvnrepository.com/artifact/it.json/json)
 
-**[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=org/json/json/20210307/json-20210307.jar)**
+**[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=it.json/json/20210307/json-20210307.jar)**
 
 # Overview
 
@@ -30,18 +30,18 @@ Bug fixes, code improvements, and unit test coverage changes are welcome! Becaus
 
 # Build Instructions
 
-The org.json package can be built from the command line, Maven, and Gradle. The unit tests can be executed from Maven, Gradle, or individually in an IDE e.g. Eclipse.
+The it.json package can be built from the command line, Maven, and Gradle. The unit tests can be executed from Maven, Gradle, or individually in an IDE e.g. Eclipse.
  
 **Building from the command line**
 
 *Build the class files from the package root directory src/main/java*
 ````
-javac org\json\*.java
+javac it.json\*.java
 ````
 
 *Create the jar file in the current directory*
 ````
-jar cf json-java.jar org/json/*.class
+jar cf json-java.jar it.json/*.class
 ````
 
 *Compile a program that uses the jar (see example code below)*
@@ -52,7 +52,7 @@ javac -cp .;json-java.jar Test.java
 *Test file contents*
 
 ````
-import org.json.JSONObject;
+import it.json.JSONObject;
 public class Test {
     public static void main(String args[]){
        JSONObject jo = new JSONObject("{ \"abc\" : \"def\" }");
@@ -241,9 +241,9 @@ cookie lists.
 
 # Release history:
 
-JSON-java releases can be found by searching the Maven repository for groupId "org.json"
+JSON-java releases can be found by searching the Maven repository for groupId "it.json"
 and artifactId "json". For example:
-[https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
+[https://search.maven.org/search?q=g:it.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:it.json%20AND%20a:json&core=gav)
 
 ~~~
 20210307    Recent commits and potentially breaking fix to JSONPointer
