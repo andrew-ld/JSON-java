@@ -8,27 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 
 /*
-Copyright (c) 2002 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
  */
 
 /**
@@ -209,6 +189,12 @@ public class JSONTokener {
         this.previous = (char) c;
         return this.previous;
     }
+    
+    /**
+     * Get the last character read from the input or '\0' if nothing has been read yet.
+     * @return the last character read from the input.
+     */
+    protected char getPrevious() { return this.previous;}
 
     /**
      * Increments the internal indexes according to the previous character
@@ -428,10 +414,18 @@ public class JSONTokener {
             return this.nextString(c);
         case '{':
             this.back();
-            return new JSONObject(this);
+            try {
+                return new JSONObject(this);
+            } catch (StackOverflowError e) {
+                throw new JSONException("JSON Array or Object depth too large to process.", e);
+            }
         case '[':
             this.back();
-            return new JSONArray(this);
+            try {
+                return new JSONArray(this);
+            } catch (StackOverflowError e) {
+                throw new JSONException("JSON Array or Object depth too large to process.", e);
+            }
         }
 
         /*

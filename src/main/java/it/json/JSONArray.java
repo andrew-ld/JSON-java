@@ -1,27 +1,7 @@
 package it.json;
 
 /*
- Copyright (c) 2002 JSON.org
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- The Software shall be used for Good, not Evil.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- SOFTWARE.
+Public Domain.
  */
 
 import java.io.IOException;
@@ -288,7 +268,7 @@ public class JSONArray implements Iterable<Object> {
                         .equalsIgnoreCase("true"))) {
             return true;
         }
-        throw wrongValueFormatException(index, "boolean", null);
+        throw wrongValueFormatException(index, "boolean", object, null);
     }
 
     /**
@@ -309,7 +289,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return Double.parseDouble(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(index, "double", e);
+            throw wrongValueFormatException(index, "double", object, e);
         }
     }
 
@@ -331,7 +311,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return Float.parseFloat(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(index, "float", e);
+            throw wrongValueFormatException(index, "float", object, e);
         }
     }
 
@@ -353,7 +333,7 @@ public class JSONArray implements Iterable<Object> {
             }
             return JSONObject.stringToNumber(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(index, "number", e);
+            throw wrongValueFormatException(index, "number", object, e);
         }
     }
 
@@ -378,14 +358,14 @@ public class JSONArray implements Iterable<Object> {
             // If it did, I would re-implement this with the Enum.valueOf
             // method and place any thrown exception in the JSONException
             throw wrongValueFormatException(index, "enum of type "
-                    + JSONObject.quote(clazz.getSimpleName()), null);
+                    + JSONObject.quote(clazz.getSimpleName()), opt(index), null);
         }
         return val;
     }
 
     /**
      * Get the BigDecimal value associated with an index. If the value is float
-     * or double, the the {@link BigDecimal#BigDecimal(double)} constructor
+     * or double, the {@link BigDecimal#BigDecimal(double)} constructor
      * will be used. See notes on the constructor for conversion issues that
      * may arise.
      *
@@ -441,7 +421,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return Integer.parseInt(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(index, "int", e);
+            throw wrongValueFormatException(index, "int", object, e);
         }
     }
 
@@ -460,7 +440,7 @@ public class JSONArray implements Iterable<Object> {
         if (object instanceof JSONArray) {
             return (JSONArray) object;
         }
-        throw wrongValueFormatException(index, "JSONArray", null);
+        throw wrongValueFormatException(index, "JSONArray", object, null);
     }
 
     /**
@@ -478,7 +458,7 @@ public class JSONArray implements Iterable<Object> {
         if (object instanceof JSONObject) {
             return (JSONObject) object;
         }
-        throw wrongValueFormatException(index, "JSONObject", null);
+        throw wrongValueFormatException(index, "JSONObject", object, null);
     }
 
     /**
@@ -499,7 +479,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return Long.parseLong(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(index, "long", e);
+            throw wrongValueFormatException(index, "long", object, e);
         }
     }
 
@@ -517,7 +497,7 @@ public class JSONArray implements Iterable<Object> {
         if (object instanceof String) {
             return (String) object;
         }
-        throw wrongValueFormatException(index, "String", null);
+        throw wrongValueFormatException(index, "String", object, null);
     }
 
     /**
@@ -792,7 +772,7 @@ public class JSONArray implements Iterable<Object> {
      * Get the optional BigDecimal value associated with an index. The 
      * defaultValue is returned if there is no value for the index, or if the 
      * value is not a number and cannot be converted to a number. If the value
-     * is float or double, the the {@link BigDecimal#BigDecimal(double)}
+     * is float or double, the {@link BigDecimal#BigDecimal(double)}
      * constructor will be used. See notes on the constructor for conversion
      * issues that may arise.
      *
@@ -1157,7 +1137,7 @@ public class JSONArray implements Iterable<Object> {
      *            The Map value.
      * @return this.
      * @throws JSONException
-     *             If the index is negative or if the the value is an invalid
+     *             If the index is negative or if the value is an invalid
      *             number.
      * @throws NullPointerException
      *             If a key in the map is <code>null</code>
@@ -1180,7 +1160,7 @@ public class JSONArray implements Iterable<Object> {
      *            String, or the JSONObject.NULL object.
      * @return this.
      * @throws JSONException
-     *             If the index is negative or if the the value is an invalid
+     *             If the index is negative or if the value is an invalid
      *             number.
      */
     public JSONArray put(int index, Object value) throws JSONException {
@@ -1383,7 +1363,13 @@ public class JSONArray implements Iterable<Object> {
                     return false;
                 }
             } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                return JSONObject.isNumberSimilar((Number)valueThis, (Number)valueOther);
+                if (!JSONObject.isNumberSimilar((Number)valueThis, (Number)valueOther)) {
+                	return false;
+                }
+            } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
+                if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
+                    return false;
+                }
             } else if (!valueThis.equals(valueOther)) {
                 return false;
             }
@@ -1462,6 +1448,7 @@ public class JSONArray implements Iterable<Object> {
      *         &nbsp;<small>(right bracket)</small>.
      * @throws JSONException if a called function fails
      */
+    @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
         StringWriter sw = new StringWriter();
         synchronized (sw.getBuffer()) {
@@ -1511,6 +1498,7 @@ public class JSONArray implements Iterable<Object> {
      * @return The writer.
      * @throws JSONException if a called function fails or unable to write
      */
+    @SuppressWarnings("resource")
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
         try {
@@ -1688,26 +1676,21 @@ public class JSONArray implements Iterable<Object> {
     private static JSONException wrongValueFormatException(
             int idx,
             String valueType,
-            Throwable cause) {
-        return new JSONException(
-                "JSONArray[" + idx + "] is not a " + valueType + "."
-                , cause);
-    }
-    
-    /**
-     * Create a new JSONException in a common format for incorrect conversions.
-     * @param idx index of the item
-     * @param valueType the type of value being coerced to
-     * @param cause optional cause of the coercion failure
-     * @return JSONException that can be thrown.
-     */
-    private static JSONException wrongValueFormatException(
-            int idx,
-            String valueType,
             Object value,
             Throwable cause) {
+        if(value == null) {
+            return new JSONException(
+                    "JSONArray[" + idx + "] is not a " + valueType + " (null)."
+                    , cause);
+        }
+        // don't try to toString collections or known object types that could be large.
+        if(value instanceof Map || value instanceof Iterable || value instanceof JSONObject) {
+            return new JSONException(
+                    "JSONArray[" + idx + "] is not a " + valueType + " (" + value.getClass() + ")."
+                    , cause);
+        }
         return new JSONException(
-                "JSONArray[" + idx + "] is not a " + valueType + " (" + value + ")."
+                "JSONArray[" + idx + "] is not a " + valueType + " (" + value.getClass() + " : " + value + ")."
                 , cause);
     }
 
